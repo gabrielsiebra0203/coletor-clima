@@ -1,0 +1,17 @@
+services:
+  coletor:
+    build: .
+    image: coletor-clima:1.0
+    environment:
+      DIAS_PREVISAO: ${DIAS_PREVISAO:-7}
+    volumes:
+      - dados-clima:/dados
+    restart: "no"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  dados-clima:

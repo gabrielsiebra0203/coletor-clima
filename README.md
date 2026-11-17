@@ -1,87 +1,222 @@
-# Coletor de Clima
+﻿# Coletor de Clima
 
-Automação em Python que coleta a previsão do tempo (API Open-Meteo) e grava em um
-banco SQLite, sem duplicar registros. Empacotada em Docker.
+[![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![SQLite](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![API](https://img.shields.io/badge/API-Open--Meteo-4CAF50)](https://open-meteo.com/)
 
-## Como rodar
+AutomaÃ§Ã£o desenvolvida em Python para coletar previsÃµes meteorolÃ³gicas, armazenar os dados em SQLite e acompanhar a atualizaÃ§Ã£o das coletas.
 
-```bash
-docker build -t coletor-clima:1.0 .
-docker run --rm -v dados-clima:/dados coletor-clima:1.0
+O projeto utiliza Docker para empacotamento e execuÃ§Ã£o, permitindo agendamento periÃ³dico em servidores Linux.
+
+**RepositÃ³rio:**
+https://github.com/gabrielsiebra0203/coletor-clima
+
+---
+
+## Sobre o projeto
+
+O Coletor de Clima consulta a API pÃºblica Open-Meteo e armazena previsÃµes meteorolÃ³gicas de trÃªs cidades brasileiras:
+
+- Fortaleza (CE)
+- SÃ£o Paulo (SP)
+- Recife (PE)
+
+Os dados sÃ£o persistidos em um banco SQLite, evitando duplicidade de registros e atualizando as previsÃµes existentes a cada nova coleta.
+
+O projeto tambÃ©m possui ferramentas para consultar os dados armazenados e verificar se as coletas estÃ£o acontecendo dentro do intervalo esperado.
+
+## Funcionalidades
+
+- Consulta automÃ¡tica Ã  API Open-Meteo.
+- Coleta de temperatura mÃ¡xima e mÃ­nima.
+- Coleta de precipitaÃ§Ã£o prevista.
+- Armazenamento em banco de dados SQLite.
+- AtualizaÃ§Ã£o de registros existentes sem duplicaÃ§Ã£o.
+- Consulta e resumo dos dados coletados.
+- VerificaÃ§Ã£o da Ãºltima coleta por cidade.
+- IdentificaÃ§Ã£o de coletas atrasadas.
+- ExecuÃ§Ã£o automatizada com Cron.
+- PersistÃªncia de dados por volume Docker.
+- ExecuÃ§Ã£o do container com usuÃ¡rio nÃ£o-root.
+
+## Tecnologias utilizadas
+
+| Tecnologia | AplicaÃ§Ã£o |
+|---|---|
+| Python 3.12 | LÃ³gica de coleta e processamento |
+| Requests | RequisiÃ§Ãµes HTTP Ã  API |
+| SQLite | PersistÃªncia dos dados |
+| Docker | Empacotamento e isolamento |
+| Docker Compose | ConfiguraÃ§Ã£o e execuÃ§Ã£o |
+| Linux / Cron | Agendamento das coletas |
+| Open-Meteo | Fonte dos dados meteorolÃ³gicos |
+
+## Estrutura do projeto
+
+```text
+coletor-clima/
+â”œâ”€â”€ agendamento/
+â”‚   â”œâ”€â”€ crontab.exemplo
+â”‚   â””â”€â”€ logrotate.exemplo
+â”œâ”€â”€ app/
+â”‚   â”œâ”€â”€ coletor.py
+â”‚   â”œâ”€â”€ consultar.py
+â”‚   â””â”€â”€ verificar.py
+â”œâ”€â”€ scripts/
+â”‚   â”œâ”€â”€ rodar-coletor.sh
+â”‚   â””â”€â”€ verificar-coleta.sh
+â”œâ”€â”€ .dockerignore
+â”œâ”€â”€ .env.example
+â”œâ”€â”€ .gitignore
+â”œâ”€â”€ Dockerfile
+â”œâ”€â”€ compose.yaml
+â”œâ”€â”€ requirements.txt
+â””â”€â”€ README.md
 ```
 
-## Rodando com Docker Compose
+## Requisitos
+
+- Python 3.12 ou superior, caso execute fora do Docker.
+- Docker instalado.
+- Docker Compose.
+- ConexÃ£o com a internet para acessar a API Open-Meteo.
+
+## ConfiguraÃ§Ã£o
+
+Clone o repositÃ³rio:
 
 ```bash
-cp .env.example .env        # no PowerShell: Copy-Item .env.example .env
+git clone https://github.com/gabrielsiebra0203/coletor-clima.git
+cd coletor-clima
+```
+
+Crie o arquivo de configuraÃ§Ã£o:
+
+```bash
+cp .env.example .env
+```
+
+No PowerShell, utilize:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+### VariÃ¡veis de ambiente
+
+| VariÃ¡vel | PadrÃ£o | DescriÃ§Ã£o |
+|---|---|---|
+| `DIAS_PREVISAO` | `7` | Quantidade de dias de previsÃ£o, entre 1 e 16 |
+
+Exemplo para coletar trÃªs dias de previsÃ£o:
+
+```env
+DIAS_PREVISAO=3
+```
+
+## Executando com Docker Compose
+
+Construa a imagem:
+
+```bash
 docker compose build
+```
+
+Execute o coletor:
+
+```bash
 docker compose run --rm coletor
 ```
 
-Ver os logs da última execução e os dados coletados:
+O coletor funciona como um job: executa a coleta e encerra o processo ao terminar.
+
+## Consultando os dados
+
+Para consultar os registros armazenados:
 
 ```bash
-docker compose logs --tail 20
 docker compose run --rm coletor python consultar.py
 ```
 
-> O coletor é um *job*: roda e termina. Para execução periódica, use agendamento (cron).
+O relatÃ³rio apresenta:
 
-## Configuração
+- Quantidade de registros.
+- VerificaÃ§Ã£o de registros duplicados.
+- Ãšltima coleta registrada por cidade.
+- Dias com maior volume de precipitaÃ§Ã£o prevista.
 
-| Variável | Padrão | Descrição |
-|---|---|---|
-| `DATA_DIR` | `/dados` (no container) | Pasta onde o banco é gravado |
-| `DIAS_PREVISAO` | `7` | Dias de previsão (1 a 16) |
+## VerificaÃ§Ã£o de saÃºde
 
-Exemplo:
-
-```bash
-docker run --rm -v dados-clima:/dados -e DIAS_PREVISAO=3 coletor-clima:1.0
-```
-
-## Verificar os dados coletados
+Para verificar se as coletas estÃ£o atualizadas:
 
 ```bash
-docker run --rm -v dados-clima:/dados coletor-clima:1.0 python consultar.py
+docker compose run --rm coletor python verificar.py
 ```
 
-## Código de saída
+O verificador analisa a Ãºltima coleta de cada cidade e utiliza a variÃ¡vel `MAX_HORAS_SEM_COLETA`, cujo padrÃ£o Ã© de 13 horas.
 
-O programa termina com `0` em caso de sucesso e `1` se alguma cidade falhar.
+CÃ³digos de saÃ­da:
 
-## Agendamento com cron
+| CÃ³digo | Significado |
+|---|---|
+| `0` | Coletas atualizadas |
+| `1` | Coleta atrasada |
+| `2` | Banco, dados ou configuraÃ§Ã£o invÃ¡lidos |
 
-O coletor é um *job*: roda e termina. Em um servidor Linux, o `cron` dispara a coleta
-nos horários definidos, chamando o script `scripts/rodar-coletor.sh`.
+## PersistÃªncia dos dados
 
-Exemplo de crontab (veja `agendamento/crontab.exemplo`):
+O banco SQLite Ã© armazenado no diretÃ³rio `/dados` dentro do container.
 
-```
-0 0,12,18 * * * flock -n /tmp/coletor-clima.lock /bin/sh /opt/coletor-clima/scripts/rodar-coletor.sh >> $HOME/logs/coletor-clima.log 2>&1
-```
+O Docker Compose utiliza um volume nomeado:
 
-Servidores usam UTC. Esta linha coleta às 09:00, 15:00 e 21:00 no horário de Fortaleza (UTC-3).
-
-Para testar manualmente:
-
-```bash
-sh scripts/rodar-coletor.sh
+```yaml
+volumes:
+  dados-clima:
 ```
 
+Assim, os dados permanecem armazenados mesmo apÃ³s o encerramento ou a remoÃ§Ã£o dos containers temporÃ¡rios.
 
-## Deploy em VPS (Linux)
+## Agendamento automÃ¡tico
 
-```bash
-git clone https://github.com/SEU-USUARIO/coletor-clima.git /opt/coletor-clima
-cd /opt/coletor-clima
-cp .env.example .env
-docker compose build
-sh scripts/rodar-coletor.sh
+O projeto inclui exemplos de agendamento utilizando Cron:
+
+```text
+agendamento/crontab.exemplo
 ```
 
-Para atualizar o servidor depois de mudar o código:
+TambÃ©m disponibiliza scripts para execuÃ§Ã£o e verificaÃ§Ã£o:
 
-```bash
-cd /opt/coletor-clima && git pull && docker compose build
+```text
+scripts/rodar-coletor.sh
+scripts/verificar-coleta.sh
 ```
+
+Os exemplos podem ser utilizados em servidores Linux para automatizar as coletas em horÃ¡rios definidos.
+
+O projeto tambÃ©m inclui um exemplo de configuraÃ§Ã£o de rotaÃ§Ã£o de logs:
+
+```text
+agendamento/logrotate.exemplo
+```
+
+## SeguranÃ§a e boas prÃ¡ticas
+
+- Container executado com usuÃ¡rio nÃ£o-root.
+- Dados persistidos em volume Docker.
+- Arquivos de configuraÃ§Ã£o locais protegidos pelo `.gitignore` e `.dockerignore`.
+- Logs do Docker limitados a 10 MB por arquivo, com atÃ© 3 arquivos.
+- RequisiÃ§Ãµes HTTP realizadas com a biblioteca Requests.
+
+## API utilizada
+
+Os dados meteorolÃ³gicos sÃ£o obtidos por meio da API pÃºblica Open-Meteo:
+
+https://open-meteo.com/
+
+## Autor
+
+Desenvolvido por Gabriel Braga.
+
+GitHub:
+https://github.com/gabrielsiebra0203

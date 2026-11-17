@@ -10,6 +10,23 @@ docker build -t coletor-clima:1.0 .
 docker run --rm -v dados-clima:/dados coletor-clima:1.0
 ```
 
+## Rodando com Docker Compose
+
+```bash
+cp .env.example .env        # no PowerShell: Copy-Item .env.example .env
+docker compose build
+docker compose run --rm coletor
+```
+
+Ver os logs da última execução e os dados coletados:
+
+```bash
+docker compose logs --tail 20
+docker compose run --rm coletor python consultar.py
+```
+
+> O coletor é um *job*: roda e termina. Para execução periódica, use agendamento (cron).
+
 ## Configuração
 
 | Variável | Padrão | Descrição |

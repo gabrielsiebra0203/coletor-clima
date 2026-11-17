@@ -1,0 +1,10 @@
+# Crontab do coletor de clima.
+#
+# Campos:  minuto  hora  dia-do-mês  mês  dia-da-semana  comando
+# Servidores usam UTC. Fortaleza é UTC-3 (sem horário de verão).
+MAILTO=""
+
+# Coleta 3 vezes por dia: 09:00, 15:00 e 21:00 em Fortaleza = 12:00, 18:00 e 00:00 UTC.
+# flock -n impede duas coletas ao mesmo tempo; a saída é acrescentada ao arquivo de log.
+# Ajuste o caminho /opt/coletor-clima para onde o projeto ficar no servidor.
+0 0,12,18 * * * flock -n /tmp/coletor-clima.lock /bin/sh /opt/coletor-clima/scripts/rodar-coletor.sh >> $HOME/logs/coletor-clima.log 2>&1

@@ -49,3 +49,22 @@ docker run --rm -v dados-clima:/dados coletor-clima:1.0 python consultar.py
 ## Código de saída
 
 O programa termina com `0` em caso de sucesso e `1` se alguma cidade falhar.
+
+## Agendamento com cron
+
+O coletor é um *job*: roda e termina. Em um servidor Linux, o `cron` dispara a coleta
+nos horários definidos, chamando o script `scripts/rodar-coletor.sh`.
+
+Exemplo de crontab (veja `agendamento/crontab.exemplo`):
+
+```
+0 0,12,18 * * * flock -n /tmp/coletor-clima.lock /bin/sh /opt/coletor-clima/scripts/rodar-coletor.sh >> $HOME/logs/coletor-clima.log 2>&1
+```
+
+Servidores usam UTC. Esta linha coleta às 09:00, 15:00 e 21:00 no horário de Fortaleza (UTC-3).
+
+Para testar manualmente:
+
+```bash
+sh scripts/rodar-coletor.sh
+```

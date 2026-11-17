@@ -1,19 +1,34 @@
 # Coletor de Clima
 
-Automação em Python que coleta a previsão do tempo e grava em um banco SQLite,
-empacotada em Docker para rodar em qualquer servidor.
+Automação em Python que coleta a previsão do tempo (API Open-Meteo) e grava em um
+banco SQLite, sem duplicar registros. Empacotada em Docker.
 
-> Projeto em construção, feito durante os estudos de Docker e deploy.
-
-## Executar o exemplo inicial
+## Como rodar
 
 ```bash
-docker build -t coletor-clima:ola .
-docker run --rm coletor-clima:ola
+docker build -t coletor-clima:1.0 .
+docker run --rm -v dados-clima:/dados coletor-clima:1.0
 ```
 
-Com variável de ambiente:
+## Configuração
+
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `DATA_DIR` | `/dados` (no container) | Pasta onde o banco é gravado |
+| `DIAS_PREVISAO` | `7` | Dias de previsão (1 a 16) |
+
+Exemplo:
 
 ```bash
-docker run --rm -e NOME=Maria coletor-clima:ola
+docker run --rm -v dados-clima:/dados -e DIAS_PREVISAO=3 coletor-clima:1.0
 ```
+
+## Verificar os dados coletados
+
+```bash
+docker run --rm -v dados-clima:/dados coletor-clima:1.0 python consultar.py
+```
+
+## Código de saída
+
+O programa termina com `0` em caso de sucesso e `1` se alguma cidade falhar.

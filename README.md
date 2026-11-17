@@ -56,23 +56,23 @@ O projeto tambÃ©m possui ferramentas para consultar os dados armazenados e ver
 
 ```text
 coletor-clima/
-â”œâ”€â”€ agendamento/
-â”‚   â”œâ”€â”€ crontab.exemplo
-â”‚   â””â”€â”€ logrotate.exemplo
-â”œâ”€â”€ app/
-â”‚   â”œâ”€â”€ coletor.py
-â”‚   â”œâ”€â”€ consultar.py
-â”‚   â””â”€â”€ verificar.py
-â”œâ”€â”€ scripts/
-â”‚   â”œâ”€â”€ rodar-coletor.sh
-â”‚   â””â”€â”€ verificar-coleta.sh
-â”œâ”€â”€ .dockerignore
-â”œâ”€â”€ .env.example
-â”œâ”€â”€ .gitignore
-â”œâ”€â”€ Dockerfile
-â”œâ”€â”€ compose.yaml
-â”œâ”€â”€ requirements.txt
-â””â”€â”€ README.md
+├── agendamento/
+│   ├── crontab.exemplo
+│   └── logrotate.exemplo
+├── app/
+│   ├── coletor.py
+│   ├── consultar.py
+│   └── verificar.py
+├── scripts/
+│   ├── rodar-coletor.sh
+│   └── verificar-coleta.sh
+├── .dockerignore
+├── .env.example
+├── .gitignore
+├── Dockerfile
+├── compose.yaml
+├── requirements.txt
+└── README.md
 ```
 
 ## Requisitos

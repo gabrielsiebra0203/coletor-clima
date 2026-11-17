@@ -1,0 +1,9 @@
+/home/deploy/logs/*.log {
+    weekly
+    rotate 8
+    compress
+    delaycompress
+    missingok
+    notifempty
+    su deploy deploy
+}

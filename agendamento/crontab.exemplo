@@ -8,3 +8,8 @@ MAILTO=""
 # flock -n impede duas coletas ao mesmo tempo; a saída é acrescentada ao arquivo de log.
 # Ajuste o caminho /opt/coletor-clima para onde o projeto ficar no servidor.
 0 0,12,18 * * * flock -n /tmp/coletor-clima.lock /bin/sh /opt/coletor-clima/scripts/rodar-coletor.sh >> $HOME/logs/coletor-clima.log 2>&1
+
+# Verificação de saúde: de hora em hora, no minuto 30 (veja scripts/verificar-coleta.sh).
+# Para receber alertas, adicione no crontab DO SERVIDOR (nunca no GitHub) uma linha:
+#   HEALTHCHECK_URL=https://...
+30 * * * * flock -n /tmp/verificar-coleta.lock /bin/sh /opt/coletor-clima/scripts/verificar-coleta.sh >> $HOME/logs/verificacao.log 2>&1

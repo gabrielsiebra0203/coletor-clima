@@ -68,3 +68,20 @@ Para testar manualmente:
 ```bash
 sh scripts/rodar-coletor.sh
 ```
+
+
+## Deploy em VPS (Linux)
+
+```bash
+git clone https://github.com/SEU-USUARIO/coletor-clima.git /opt/coletor-clima
+cd /opt/coletor-clima
+cp .env.example .env
+docker compose build
+sh scripts/rodar-coletor.sh
+```
+
+Para atualizar o servidor depois de mudar o código:
+
+```bash
+cd /opt/coletor-clima && git pull && docker compose build
+```
